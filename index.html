@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Шкільний Бот</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-attachment: fixed;
+      color: #fff;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 20px;
+      font-size: 1.7rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 25px rgba(0,0,0,0.4);
+      z-index: 10;
+      position: sticky;
+      top: 0;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+    }
+
+    .container {
+      padding: 25px 15px;
+      max-width: 650px;
+      margin: auto;
+      position: relative;
+    }
+
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      width: 100%;
+      transition: all 0.45s ease;
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    .screen.active {
+      left: 0;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .btn {
+      display: block;
+      margin: 15px auto;
+      padding: 16px 25px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 85%;
+      max-width: 420px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+      letter-spacing: 0.5px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      background: linear-gradient(135deg, #2a5298, #1e3c72);
+      box-shadow: 0 6px 28px rgba(0,0,0,0.5);
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .card {
+      margin: 20px auto;
+      padding: 25px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 18px;
+      max-width: 600px;
+      opacity: 0;
+      transform: translateY(20px) scale(0.97);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.35);
+      backdrop-filter: blur(8px);
+    }
+
+    .card.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .back-btn {
+      margin-top: 25px;
+      background: linear-gradient(135deg, #8e0e00, #1f1c18);
+    }
+  </style>
+</head>
+<body>
+  <header>Шкільний Бот</header>
+
+  <div class="container">
+    <!-- Головний екран -->
+    <div id="home" class="screen active">
+      <h2>Привіт! Це бот школи Нового Яричева!<br>Приємного користування</h2>
+      <button class="btn" onclick="navigate('menu')">Розпочати</button>
+    </div>
+
+    <!-- Головне меню -->
+    <div id="menu" class="screen">
+      <button class="btn" onclick="navigate('classes')">Розклад Уроків</button>
+      <button class="btn" onclick="navigate('bells')">Розклад Дзвінків</button>
+      <a href="https://t.me/schoolyaruchiv" class="btn">Запропонувати ідею</a>
+      <button class="btn back-btn" onclick="goBack()">Назад</button>
+    </div>
+
+    <!-- Вибір класу -->
+    <div id="classes" class="screen">
+      <h2>Виберіть клас</h2>
+      <div id="classButtons"></div>
+      <button class="btn back-btn" onclick="goBack()">Назад</button>
+    </div>
+
+    <!-- Розклад конкретного класу -->
+    <div id="schedule" class="screen">
+      <div class="card" id="scheduleCard">
+        <h2 id="classTitle"></h2>
+        <p id="classSchedule">РОЗКЛАД</p>
+      </div>
+      <button class="btn back-btn" onclick="goBack()">Назад</button>
+    </div>
+
+    <!-- Розклад дзвінків -->
+    <div id="bells" class="screen">
+      <div class="card show">
+        <h2>Розклад Дзвінків</h2>
+        <p>
+          1. 8:30-9:15 <br>
+          2. 9:25-10:10 <br>
+          3. 10:30-11:15 <br>
+          4. 11:35-12:20 <br>
+          5. 12:30-13:15 <br>
+          6. 13:25-14:10 <br>
+          7. 14:20-15:05
+        </p>
+      </div>
+      <button class="btn back-btn" onclick="goBack()">Назад</button>
+    </div>
+  </div>
+
+  <script>
+    const schedules = {
+      "5-А": "РОЗКЛАД 5-А",
+      "5-Б": "РОЗКЛАД 5-Б",
+      "5-В": "РОЗКЛАД 5-В",
+      "6-А": "РОЗКЛАД 6-А",
+      "6-Б": "РОЗКЛАД 6-Б",
+      "6-В": "РОЗКЛАД 6-В",
+      "7-А": "РОЗКЛАД 7-А",
+      "7-Б": "РОЗКЛАД 7-Б",
+      "7-В": "РОЗКЛАД 7-В",
+      "8-А": "РОЗКЛАД 8-А",
+      "8-Б": "РОЗКЛАД 8-Б",
+      "8-В": "РОЗКЛАД 8-В",
+      "9-А": "РОЗКЛАД 9-А",
+      "9-Б": "РОЗКЛАД 9-Б",
+      "9-В": "РОЗКЛАД 9-В",
+      "10-А": "РОЗКЛАД 10-А",
+      "10-Б": "РОЗКЛАД 10-Б",
+      "11-А": "РОЗКЛАД 11-А",
+      "11-Б": "РОЗКЛАД 11-Б"
+    };
+
+    const classList = Object.keys(schedules);
+    let currentScreen = "home";
+    let historyStack = ["home"];
+
+    function navigate(target) {
+      document.getElementById(currentScreen).classList.remove("active");
+      currentScreen = target;
+      document.getElementById(currentScreen).classList.add("active");
+      historyStack.push(target);
+      if (target === "classes") renderClasses();
+    }
+
+    function goBack() {
+      if (historyStack.length > 1) {
+        document.getElementById(currentScreen).classList.remove("active");
+        historyStack.pop();
+        currentScreen = historyStack[historyStack.length - 1];
+        document.getElementById(currentScreen).classList.add("active");
+      }
+    }
+
+    function renderClasses() {
+      const container = document.getElementById("classButtons");
+      container.innerHTML = "";
+      classList.forEach(cls => {
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.textContent = cls;
+        btn.onclick = () => showSchedule(cls);
+        container.appendChild(btn);
+      });
+    }
+
+    function showSchedule(cls) {
+      navigate("schedule");
+      document.getElementById("classTitle").textContent = cls;
+      document.getElementById("classSchedule").textContent = schedules[cls];
+      const card = document.getElementById("scheduleCard");
+      card.classList.remove("show");
+      setTimeout(() => card.classList.add("show"), 100);
+    }
+  </script>
+</body>
+</html>
