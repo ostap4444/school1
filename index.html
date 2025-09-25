@@ -245,10 +245,3 @@ html_code = """<!DOCTYPE html>
   </script>
 </body>
 </html>"""
-
-# Створимо архів
-out_path = Path("/mnt/data/shkilniy_bot_v3.zip")
-with zipfile.ZipFile(out_path, "w") as zf:
-    zf.writestr("index.html", html_code)
-
-out_path
